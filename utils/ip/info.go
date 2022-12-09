@@ -12,7 +12,7 @@ const (
 	url = "https://ipinfo.io/"
 )
 
-type IPInfo struct {
+type IPData struct {
 	IP       string `json:"ip"`
 	Hostname string `json:"hostname"`
 	City     string `json:"city"`
@@ -22,7 +22,7 @@ type IPInfo struct {
 	Timezone string `json:"timezone"`
 }
 
-func Info(ip string) (*IPInfo, error) {
+func Info(ip string) (*IPData, error) {
 	response, err := http.Get(url + ip)
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func Info(ip string) (*IPInfo, error) {
 	}
 	defer response.Body.Close()
 
-	var data IPInfo
+	var data IPData
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		return nil, err

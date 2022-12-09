@@ -7,7 +7,7 @@ import (
 
 func TestIP(t *testing.T) {
 	ip := "77.91.123.163"
-	data := IPInfo{
+	data := IPData{
 		IP:       ip,
 		Hostname: "onorridg.tech",
 		City:     "Meppel",
