@@ -1,5 +1,7 @@
 package ipinfo
 
+//package main
+
 import (
 	"net/http"
 
@@ -7,11 +9,14 @@ import (
 
 	"ip"
 	"validator"
+	m "middleware"
 )
 
 const (
 	StatusUnknownError = 520
 )
+
+var authMiddleware = m.AuthMiddleware()
 
 func getIpinfoV1(c *gin.Context) {
 	IPStr := c.Param("ip")
@@ -35,11 +40,19 @@ func getIpinfoV1(c *gin.Context) {
 
 func apiV1(router *gin.Engine) {
 	V1 := router.Group("/v1")
-	V1.GET("/:ip", getIpinfoV1)
+	V1.Use(authMiddleware.MiddlewareFunc())
+	{
+		V1.GET("/:ip", getIpinfoV1)
+	}
+}
+
+func login(router *gin.Engine){
+	router.POST("/login", authMiddleware.LoginHandler)
 }
 
 func IPInfo() {
 	router := gin.Default()
+	login(router)
 	apiV1(router)
 	router.Run("localhost:8080")
 }

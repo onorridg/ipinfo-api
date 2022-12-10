@@ -1,22 +1,13 @@
-module ipinfo
+module auth
 
 go 1.19
 
 require (
+	github.com/appleboy/gin-jwt/v2 v2.9.0
 	github.com/gin-gonic/gin v1.8.1
-	ip v0.0.0-00010101000000-000000000000
-	middleware v0.0.0-00010101000000-000000000000
-	validator v0.0.0-00010101000000-000000000000
-)
-
-replace (
-	ip => ../../utils/ip
-	middleware => ../middleware
-	validator => ../../utils/validator
 )
 
 require (
-	github.com/appleboy/gin-jwt/v2 v2.9.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect

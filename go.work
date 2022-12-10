@@ -2,6 +2,8 @@ go 1.19
 
 use (
 	./api/ipinfo
+	./api/middleware
+	./cmd
 	./utils/ip
 	./utils/validator
 )
