@@ -6,5 +6,6 @@ use (
 	./api/middleware
 	./cmd
 	./utils/ip
+	./utils/password
 	./utils/validator
 )

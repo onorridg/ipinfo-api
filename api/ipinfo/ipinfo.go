@@ -8,6 +8,8 @@ import (
 	"ip"
 	"validator"
 	m "middleware"
+	"password"
+	rdb "redisDB"
 )
 
 const (
@@ -58,7 +60,19 @@ func postSignInUser(c *gin.Context){
 		)
 		return
 	}
-	// if username exist => 409 
+	pHash := password.PasswordToHash(uCred.Password)
+	err := rdb.SetKeyValue(uCred.Username, pHash)
+	if err != nil {
+		c.IndentedJSON(
+			http.StatusConflict,
+			gin.H{"message": "Username already exist"},
+		)
+		return
+	}
+	c.IndentedJSON(
+		http.StatusCreated,
+		gin.H{"message": "Ok"},
+	)
 }
 
 func IPInfo() {

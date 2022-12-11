@@ -6,6 +6,9 @@ import (
 
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
+
+	p "password"
+	rdb "redisDB"
 )
 
 var identityKey = "username"
@@ -15,8 +18,14 @@ type login struct {
 	Password string `form:"password" json:"password" binding:"required"`
 }
 
+var Roles = map[string][]string{
+	"User": {"/v1/"},
+}
+
+
 type User struct {
 	UserName string
+	Role []string
 }
 
 func AuthMiddleware() *jwt.GinJWTMiddleware {
@@ -45,23 +54,26 @@ func AuthMiddleware() *jwt.GinJWTMiddleware {
 			if err := c.ShouldBind(&loginVals); err != nil {
 				return "", jwt.ErrMissingLoginValues
 			}
-			userID := loginVals.Username
+			username := loginVals.Username
 			password := loginVals.Password
 
-			if (userID == "admin" && password == "admin") || (userID == "onorridg" && password == "onorridg") {
+			ex, hPassword := rdb.GetValue(username)
+			if ex == rdb.UserMissing{
+				return nil, jwt.ErrFailedAuthentication
+			} else if p.CompareHashPassword(hPassword, password){
 				return &User{
-					UserName: userID,
+					UserName: username,
 				}, nil
 			}
-
 			return nil, jwt.ErrFailedAuthentication
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {
-			if v, ok := data.(*User); ok && (v.UserName == "admin" || v.UserName == "onorridg") {
-				return true
-			}
 
-			return false
+			// if v, ok := data.(*User); ok && (v.UserName == "admin" || v.UserName == "onorridg") {
+			// 	return true
+			// }
+			//return false
+			return true
 		},
 		Unauthorized: func(c *gin.Context, code int, message string) {
 			c.JSON(code, gin.H{

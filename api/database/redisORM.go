@@ -36,7 +36,7 @@ func getConnection()*redis.Client{
 	return rdb
 }
 
-func setKeyValue(key, value string)(error){
+func SetKeyValue(key, value string)(error){
 	rdb := getConnection()
 	defer rdb.Close()
 
@@ -49,12 +49,12 @@ func setKeyValue(key, value string)(error){
 	return nil
 }
 
-func getValue(key string)(int, string){
+func GetValue(key string)(int, string){
 	rdb := getConnection()
 	defer rdb.Close()
 
 	value, err := rdb.Get(ctx, key).Result()
-	if err != redis.Nil {
+	if err == redis.Nil {
 		return UserMissing , ""
 	} else if err != nil{
 		panic(err)
