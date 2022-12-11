@@ -1,7 +1,5 @@
 package ipinfo
 
-//package main
-
 import (
 	"net/http"
 
@@ -15,6 +13,11 @@ import (
 const (
 	StatusUnknownError = 520
 )
+
+type UserCredential struct {
+	Username string `form:"username" json:"username" binding:"required"`
+	Password string `form:"password" json:"password" binding:"required"`
+}
 
 var authMiddleware = m.AuthMiddleware()
 
@@ -46,13 +49,22 @@ func apiV1(router *gin.Engine) {
 	}
 }
 
-func login(router *gin.Engine){
-	router.POST("/login", authMiddleware.LoginHandler)
+func postSignInUser(c *gin.Context){
+	uCred := UserCredential{}
+	if err := c.ShouldBind(&uCred); err != nil {
+		c.IndentedJSON(
+			http.StatusUnprocessableEntity,
+			gin.H{"message": "Invalid user credential"},
+		)
+		return
+	}
+	// if username exist => 409 
 }
 
 func IPInfo() {
 	router := gin.Default()
-	login(router)
+	router.POST("/signup", postSignInUser)
+	router.POST("/signin", authMiddleware.LoginHandler)
 	apiV1(router)
 	router.Run("localhost:8080")
 }

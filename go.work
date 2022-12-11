@@ -1,6 +1,7 @@
 go 1.19
 
 use (
+	./api/database
 	./api/ipinfo
 	./api/middleware
 	./cmd

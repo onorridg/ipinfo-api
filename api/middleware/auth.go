@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var identityKey = "id"
+var identityKey = "username"
 
 type login struct {
 	Username string `form:"username" json:"username" binding:"required"`
@@ -17,15 +17,14 @@ type login struct {
 
 type User struct {
 	UserName string
-	Email    string
 }
 
 func AuthMiddleware() *jwt.GinJWTMiddleware {
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "test zone",
-		Key:         []byte("secret key"),
+		Key:         []byte(`m^BT6sA-y}e2ZYpuU]gApLrY^sD*Eyju`),
 		Timeout:     time.Hour,
-		MaxRefresh:  time.Hour,
+		MaxRefresh: 	time.Hour,
 		IdentityKey: identityKey,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*User); ok {
@@ -52,7 +51,6 @@ func AuthMiddleware() *jwt.GinJWTMiddleware {
 			if (userID == "admin" && password == "admin") || (userID == "onorridg" && password == "onorridg") {
 				return &User{
 					UserName: userID,
-					Email:    "admin@admin.com",
 				}, nil
 			}
 
