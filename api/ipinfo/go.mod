@@ -3,9 +3,13 @@ module ipinfo
 go 1.19
 
 require (
+	github.com/chenyahui/gin-cache v1.7.1
 	github.com/gin-gonic/gin v1.8.1
+	github.com/go-redis/redis/v8 v8.11.4
 	ip v0.0.0-00010101000000-000000000000
 	middleware v0.0.0-00010101000000-000000000000
+	password v0.0.0-00010101000000-000000000000
+	redisDB v0.0.0-00010101000000-000000000000
 	validator v0.0.0-00010101000000-000000000000
 )
 
@@ -28,6 +32,7 @@ require (
 	github.com/go-redis/redis/v9 v9.0.0-rc.2 // indirect
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
+	github.com/jellydator/ttlcache/v2 v2.11.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
@@ -37,10 +42,9 @@ require (
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	golang.org/x/crypto v0.4.0 // indirect
 	golang.org/x/net v0.3.0 // indirect
+	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
 	golang.org/x/sys v0.3.0 // indirect
 	golang.org/x/text v0.5.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	password v0.0.0-00010101000000-000000000000 // indirect
-	redisDB v0.0.0-00010101000000-000000000000 // indirect
 )

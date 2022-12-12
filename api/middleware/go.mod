@@ -10,6 +10,8 @@ replace (
 require (
 	github.com/appleboy/gin-jwt/v2 v2.9.0
 	github.com/gin-gonic/gin v1.8.1
+	password v0.0.0-00010101000000-000000000000
+	redisDB v0.0.0-00010101000000-000000000000
 )
 
 require (
@@ -35,6 +37,4 @@ require (
 	golang.org/x/text v0.5.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	password v0.0.0-00010101000000-000000000000 // indirect
-	redisDB v0.0.0-00010101000000-000000000000 // indirect
 )

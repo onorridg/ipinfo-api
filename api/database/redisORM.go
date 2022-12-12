@@ -24,11 +24,14 @@ func checkConnection(client *redis.Client)bool{
 	return true
 }
 
-func getConnection()*redis.Client{
+
+var DB = 0
+
+func GetConnection(db int)*redis.Client{
 	rdb := redis.NewClient(&redis.Options{
         Addr:     "localhost:6379",
         Password: "", // no password set
-        DB:       0,  // use default DB
+        DB:       db,  // use default DB
     })
 	if !checkConnection(rdb){
 		log.Fatalln("Failed connection to redis database!")
@@ -37,7 +40,7 @@ func getConnection()*redis.Client{
 }
 
 func SetKeyValue(key, value string)(error){
-	rdb := getConnection()
+	rdb := GetConnection(DB)
 	defer rdb.Close()
 
 	result, err := rdb.SetNX(ctx, key, value, 0).Result()
@@ -50,7 +53,7 @@ func SetKeyValue(key, value string)(error){
 }
 
 func GetValue(key string)(int, string){
-	rdb := getConnection()
+	rdb := GetConnection(DB)
 	defer rdb.Close()
 
 	value, err := rdb.Get(ctx, key).Result()
@@ -63,7 +66,7 @@ func GetValue(key string)(int, string){
 }
 
 func UpdateValue(key, value string)(int){
-	rdb := getConnection()
+	rdb := GetConnection(DB)
 	defer rdb.Close()
 
 	result, err := rdb.SetXX(ctx, key, value, 0).Result()

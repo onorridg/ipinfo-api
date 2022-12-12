@@ -1,15 +1,20 @@
 package ipinfo
 
 import (
+	"log"
 	"net/http"
+	"time"
 
+	"github.com/chenyahui/gin-cache"
+	"github.com/chenyahui/gin-cache/persist"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 
 	"ip"
-	"validator"
 	m "middleware"
 	p "password"
 	rdb "redisDB"
+	"validator"
 )
 
 const (
@@ -28,6 +33,7 @@ type UserResetPassword struct{
 var authMiddleware = m.AuthMiddleware()
 
 func getIpinfoV1(c *gin.Context) {
+	log.Println("NOT CACHE")
 	IPStr := c.Param("ip")
 	if !validator.IP(IPStr) {
 		c.IndentedJSON(
@@ -99,6 +105,12 @@ func patchPasswordResetV1(c *gin.Context){
 }
 
 func routerHandler(router *gin.Engine){
+	rdb :=  redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "", 
+	})	
+	rCache := persist.NewRedisStore(rdb)
+
 	api := router.Group("/api")	
 	{	
 		v1 := api.Group("/v1")
@@ -113,13 +125,13 @@ func routerHandler(router *gin.Engine){
 			ip := v1.Group("/ip")
 			ip.Use(authMiddleware.MiddlewareFunc())
 			{
-				ip.GET("/:ip", getIpinfoV1)
+				ip.GET("/:ip", cache.CacheByRequestURI(rCache, 2 * time.Minute), getIpinfoV1)
 			}
 
 			statistic := v1.Group("/statistic")
 			statistic.Use(authMiddleware.MiddlewareFunc())
 			{
-
+				
 			}
 		}
 	}
