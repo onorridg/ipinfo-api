@@ -8,7 +8,7 @@ import (
 	"ip"
 	"validator"
 	m "middleware"
-	"password"
+	p "password"
 	rdb "redisDB"
 )
 
@@ -19,6 +19,10 @@ const (
 type UserCredential struct {
 	Username string `form:"username" json:"username" binding:"required"`
 	Password string `form:"password" json:"password" binding:"required"`
+}
+type UserResetPassword struct{
+	UserCredential
+	NewPassword string `form:"new_password" json:"new_password" binding:"required"`
 }
 
 var authMiddleware = m.AuthMiddleware()
@@ -43,15 +47,7 @@ func getIpinfoV1(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, info)
 }
 
-func apiV1(router *gin.Engine) {
-	V1 := router.Group("/v1")
-	V1.Use(authMiddleware.MiddlewareFunc())
-	{
-		V1.GET("/:ip", getIpinfoV1)
-	}
-}
-
-func postSignInUser(c *gin.Context){
+func postSignInUserV1(c *gin.Context){
 	uCred := UserCredential{}
 	if err := c.ShouldBind(&uCred); err != nil {
 		c.IndentedJSON(
@@ -60,7 +56,7 @@ func postSignInUser(c *gin.Context){
 		)
 		return
 	}
-	pHash := password.PasswordToHash(uCred.Password)
+	pHash := p.PasswordToHash(uCred.Password)
 	err := rdb.SetKeyValue(uCred.Username, pHash)
 	if err != nil {
 		c.IndentedJSON(
@@ -75,10 +71,63 @@ func postSignInUser(c *gin.Context){
 	)
 }
 
+func patchPasswordResetV1(c *gin.Context){
+	uCred := UserResetPassword{}
+	if err := c.ShouldBind(&uCred); err != nil {
+		c.IndentedJSON(
+			http.StatusUnprocessableEntity,
+			gin.H{"message": "Invalid user credential"},
+		)
+		return
+	}
+
+	ex, hPassword := rdb.GetValue(uCred.Username)
+	if ex == rdb.UserMissing || !p.CompareHashPassword(hPassword, uCred.Password){
+		c.IndentedJSON(
+			http.StatusUnprocessableEntity,
+			gin.H{"message": "Invalid user credential"},
+		)
+		return
+	}
+
+	hNewPassword := p.PasswordToHash(uCred.NewPassword)
+	_ = rdb.UpdateValue(uCred.Username, hNewPassword)
+	c.IndentedJSON(
+		http.StatusOK,
+		gin.H{"message": "Password updated"},
+	)
+}
+
+func routerHandler(router *gin.Engine){
+	api := router.Group("/api")	
+	{	
+		v1 := api.Group("/v1")
+		{
+			account := v1.Group("/account")
+			{
+				account.POST("/signup", postSignInUserV1)
+				account.POST("/signin", authMiddleware.LoginHandler)
+				account.PATCH("/password", patchPasswordResetV1)
+			}
+
+			ip := v1.Group("/ip")
+			ip.Use(authMiddleware.MiddlewareFunc())
+			{
+				ip.GET("/:ip", getIpinfoV1)
+			}
+
+			statistic := v1.Group("/statistic")
+			statistic.Use(authMiddleware.MiddlewareFunc())
+			{
+
+			}
+		}
+	}
+}
+
 func IPInfo() {
 	router := gin.Default()
-	router.POST("/signup", postSignInUser)
-	router.POST("/signin", authMiddleware.LoginHandler)
-	apiV1(router)
+	routerHandler(router)
+
 	router.Run("localhost:8080")
 }

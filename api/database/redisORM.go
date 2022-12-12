@@ -61,3 +61,16 @@ func GetValue(key string)(int, string){
 	}
 	return UserExist, value
 }
+
+func UpdateValue(key, value string)(int){
+	rdb := getConnection()
+	defer rdb.Close()
+
+	result, err := rdb.SetXX(ctx, key, value, 0).Result()
+	if err != nil {
+		panic(err)
+	} else if !result{
+		return UserMissing
+	}
+	return UserExist
+}

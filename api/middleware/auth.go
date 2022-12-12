@@ -73,6 +73,7 @@ func AuthMiddleware() *jwt.GinJWTMiddleware {
 			// 	return true
 			// }
 			//return false
+			log.Println(c.Request.URL.Path)
 			return true
 		},
 		Unauthorized: func(c *gin.Context, code int, message string) {
