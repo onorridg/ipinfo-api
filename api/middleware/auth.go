@@ -11,6 +11,8 @@ import (
 	rdb "redisDB"
 )
 
+var JWT_SECRET_KEY string
+
 var identityKey = "username"
 
 type login struct {
@@ -22,18 +24,21 @@ var Roles = map[string][]string{
 	"User": {"/v1/"},
 }
 
-
 type User struct {
 	UserName string
-	Role []string
+	Role     []string
+}
+
+func InitAuthVars(jwtSK string) {
+	JWT_SECRET_KEY = jwtSK
 }
 
 func AuthMiddleware() *jwt.GinJWTMiddleware {
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "test zone",
-		Key:         []byte(`m^BT6sA-y}e2ZYpuU]gApLrY^sD*Eyju`),
+		Key:         []byte(JWT_SECRET_KEY),
 		Timeout:     time.Hour,
-		MaxRefresh: 	time.Hour,
+		MaxRefresh:  time.Hour,
 		IdentityKey: identityKey,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*User); ok {
@@ -58,9 +63,9 @@ func AuthMiddleware() *jwt.GinJWTMiddleware {
 			password := loginVals.Password
 
 			ex, hPassword := rdb.GetValue(username)
-			if ex == rdb.UserMissing{
+			if ex == rdb.UserMissing {
 				return nil, jwt.ErrFailedAuthentication
-			} else if p.CompareHashPassword(hPassword, password){
+			} else if p.CompareHashPassword(hPassword, password) {
 				return &User{
 					UserName: username,
 				}, nil

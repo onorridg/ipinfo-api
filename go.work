@@ -5,6 +5,7 @@ use (
 	./api/ipinfo
 	./api/middleware
 	./cmd
+	./utils/env
 	./utils/ip
 	./utils/password
 	./utils/validator

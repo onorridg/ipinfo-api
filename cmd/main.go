@@ -2,8 +2,10 @@ package main
 
 import (
 	API "api"
+	"env"
 )
 
-func main(){
+func main() {
+	env.InitEnvVars()
 	API.IPInfo()
 }

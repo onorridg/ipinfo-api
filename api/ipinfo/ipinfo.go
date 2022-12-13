@@ -1,14 +1,12 @@
 package ipinfo
 
 import (
-	"log"
 	"net/http"
 	"time"
 
-	"github.com/chenyahui/gin-cache"
-	"github.com/chenyahui/gin-cache/persist"
+	"github.com/gin-contrib/cache"
+	"github.com/gin-contrib/cache/persistence"
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis/v8"
 
 	"ip"
 	m "middleware"
@@ -16,6 +14,11 @@ import (
 	rdb "redisDB"
 	"validator"
 )
+
+var API_HOST string
+var REDIS_HOST string
+var REDIS_PASSWORD string
+var REDIS_CACHE_TIMEOUT_SECOND time.Duration
 
 const (
 	StatusUnknownError = 520
@@ -25,7 +28,7 @@ type UserCredential struct {
 	Username string `form:"username" json:"username" binding:"required"`
 	Password string `form:"password" json:"password" binding:"required"`
 }
-type UserResetPassword struct{
+type UserResetPassword struct {
 	UserCredential
 	NewPassword string `form:"new_password" json:"new_password" binding:"required"`
 }
@@ -33,7 +36,6 @@ type UserResetPassword struct{
 var authMiddleware = m.AuthMiddleware()
 
 func getIpinfoV1(c *gin.Context) {
-	log.Println("NOT CACHE")
 	IPStr := c.Param("ip")
 	if !validator.IP(IPStr) {
 		c.IndentedJSON(
@@ -53,7 +55,7 @@ func getIpinfoV1(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, info)
 }
 
-func postSignInUserV1(c *gin.Context){
+func postSignInUserV1(c *gin.Context) {
 	uCred := UserCredential{}
 	if err := c.ShouldBind(&uCred); err != nil {
 		c.IndentedJSON(
@@ -77,7 +79,7 @@ func postSignInUserV1(c *gin.Context){
 	)
 }
 
-func patchPasswordResetV1(c *gin.Context){
+func patchPasswordResetV1(c *gin.Context) {
 	uCred := UserResetPassword{}
 	if err := c.ShouldBind(&uCred); err != nil {
 		c.IndentedJSON(
@@ -88,7 +90,7 @@ func patchPasswordResetV1(c *gin.Context){
 	}
 
 	ex, hPassword := rdb.GetValue(uCred.Username)
-	if ex == rdb.UserMissing || !p.CompareHashPassword(hPassword, uCred.Password){
+	if ex == rdb.UserMissing || !p.CompareHashPassword(hPassword, uCred.Password) {
 		c.IndentedJSON(
 			http.StatusUnprocessableEntity,
 			gin.H{"message": "Invalid user credential"},
@@ -104,15 +106,15 @@ func patchPasswordResetV1(c *gin.Context){
 	)
 }
 
-func routerHandler(router *gin.Engine){
-	rdb :=  redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", 
-	})	
-	rCache := persist.NewRedisStore(rdb)
+func routerHandler(router *gin.Engine) {
+	rCache := persistence.NewRedisCache(
+		REDIS_HOST,
+		REDIS_PASSWORD,
+		time.Minute,
+	)
 
-	api := router.Group("/api")	
-	{	
+	api := router.Group("/api")
+	{
 		v1 := api.Group("/v1")
 		{
 			account := v1.Group("/account")
@@ -125,21 +127,32 @@ func routerHandler(router *gin.Engine){
 			ip := v1.Group("/ip")
 			ip.Use(authMiddleware.MiddlewareFunc())
 			{
-				ip.GET("/:ip", cache.CacheByRequestURI(rCache, 2 * time.Minute), getIpinfoV1)
+				ip.GET("/:ip", cache.CachePage(
+					rCache,
+					REDIS_CACHE_TIMEOUT_SECOND*time.Second,
+					getIpinfoV1),
+				)
 			}
 
 			statistic := v1.Group("/statistic")
 			statistic.Use(authMiddleware.MiddlewareFunc())
 			{
-				
+				// statistic
 			}
 		}
 	}
+}
+
+func InitIPInfoVars(apiH, rH, rP string, rCacheTime time.Duration) {
+	API_HOST = apiH
+	REDIS_HOST = rH
+	REDIS_PASSWORD = rP
+	REDIS_CACHE_TIMEOUT_SECOND = rCacheTime
 }
 
 func IPInfo() {
 	router := gin.Default()
 	routerHandler(router)
 
-	router.Run("localhost:8080")
+	router.Run(API_HOST)
 }

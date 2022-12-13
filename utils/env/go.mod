@@ -1,23 +1,22 @@
-module ipinfo
+module env
 
 go 1.19
 
+replace (
+	api => ../../api/ipinfo
+	ip => ../ip
+	middleware => ../../api/middleware
+	password => ../password
+	redisDB => ../../api/database
+	validator => ../validator
+)
+
 require (
-	github.com/gin-contrib/cache v1.2.0
-	github.com/gin-gonic/gin v1.8.1
-	ip v0.0.0-00010101000000-000000000000
+	api v0.0.0-00010101000000-000000000000
+	github.com/joho/godotenv v1.4.0
 	middleware v0.0.0-00010101000000-000000000000
 	password v0.0.0-00010101000000-000000000000
 	redisDB v0.0.0-00010101000000-000000000000
-	validator v0.0.0-00010101000000-000000000000
-)
-
-replace (
-	ip => ../../utils/ip
-	middleware => ../middleware
-	password => ../../utils/password
-	redisDB => ../database
-	validator => ../../utils/validator
 )
 
 require (
@@ -25,7 +24,9 @@ require (
 	github.com/bradfitz/gomemcache v0.0.0-20220106215444-fb4bf637b56d // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
+	github.com/gin-contrib/cache v1.2.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
+	github.com/gin-gonic/gin v1.8.1 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.10.0 // indirect
@@ -48,4 +49,6 @@ require (
 	golang.org/x/text v0.5.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	ip v0.0.0-00010101000000-000000000000 // indirect
+	validator v0.0.0-00010101000000-000000000000 // indirect
 )
