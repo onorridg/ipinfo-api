@@ -1,0 +1,26 @@
+version: "3.9"
+
+
+services:
+  ipinfo-api:
+      restart: on-failure:5
+      build:
+        context: .
+        dockerfile: Dockerfile
+      env_file: .env
+      depends_on:
+        - redisdb
+      ports:
+        - "8080:8080"
+
+  redisdb:
+    image: redis:latest
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    restart: on-failure:5
+    env_file:
+      - .env
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+volumes:
+  data:

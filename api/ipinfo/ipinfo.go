@@ -15,7 +15,7 @@ import (
 	"validator"
 )
 
-var API_HOST string
+var API_PORT string
 var REDIS_HOST string
 var REDIS_PASSWORD string
 var REDIS_CACHE_TIMEOUT_SECOND time.Duration
@@ -143,16 +143,17 @@ func routerHandler(router *gin.Engine) {
 	}
 }
 
-func InitIPInfoVars(apiH, rH, rP string, rCacheTime time.Duration) {
-	API_HOST = apiH
+func InitIPInfoVars(apiP, rH, rP string, rCacheTime time.Duration) {
+	API_PORT = apiP
 	REDIS_HOST = rH
 	REDIS_PASSWORD = rP
 	REDIS_CACHE_TIMEOUT_SECOND = rCacheTime
 }
 
 func IPInfo() {
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	routerHandler(router)
 
-	router.Run(API_HOST)
+	router.Run(":" + API_PORT)
 }

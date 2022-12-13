@@ -16,7 +16,7 @@ import (
 )
 
 type ENV struct {
-	API_HOST                   string
+	API_PORT                   string
 	JWT_SECRET_KEY             string
 	PASSWORD_SALT              string
 	REDIS_HOST                 string
@@ -31,7 +31,7 @@ func InitEnvVars() {
 		panic(err)
 	}
 
-	err = godotenv.Load(filepath.Join(wd, "../.env"))
+	err = godotenv.Load(filepath.Join(wd, ".env"))
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -46,7 +46,7 @@ func InitEnvVars() {
 	}
 
 	env := ENV{
-		API_HOST:                   os.Getenv("API_HOST"),
+		API_PORT:                   os.Getenv("API_PORT"),
 		JWT_SECRET_KEY:             os.Getenv("JWT_SECRET_KEY"),
 		PASSWORD_SALT:              os.Getenv("PASSWORD_SALT"),
 		REDIS_HOST:                 os.Getenv("REDIS_HOST"),
@@ -55,7 +55,7 @@ func InitEnvVars() {
 		REDIS_CACHE_TIMEOUT_SECOND: time.Duration(rCacheTime),
 	}
 	api.InitIPInfoVars(
-		env.API_HOST,
+		env.API_PORT,
 		env.REDIS_HOST,
 		env.REDIS_PASSWORD,
 		env.REDIS_CACHE_TIMEOUT_SECOND,
