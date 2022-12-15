@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	_ "docs"
+	"docs"
 
 	"ip"
 	m "middleware"
@@ -22,6 +22,7 @@ var API_PORT string
 var REDIS_HOST string
 var REDIS_PASSWORD string
 var REDIS_CACHE_TIMEOUT_SECOND time.Duration
+var SWAGGER_DOCS_HOST string
 
 const (
 	StatusUnknownError = 520
@@ -102,6 +103,15 @@ func postSignUpUserV1(c *gin.Context) {
 	)
 }
 
+// @Summary      Password reset
+// @Description  password
+// @Tags         auth
+// @Accept       multipart/form-data
+// @Produce      json
+// @Param        cUser		formData	UserResetPassword 	true "User Credential + new password"
+// @Success      200  {object}  string
+// @Failure      400  {object}  string
+// @Router       /auth/password [patch]
 func patchPasswordResetV1(c *gin.Context) {
 	uCred := UserResetPassword{}
 	if err := c.ShouldBind(&uCred); err != nil {
@@ -140,8 +150,12 @@ func routerHandler(router *gin.Engine) {
 	{
 		v1 := api.Group("/v1")
 		{	
+			// Swagger Docs
 			// base path swagger docs - /api/v1
-			router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+			{
+				docs.SwaggerInfo.Host = SWAGGER_DOCS_HOST
+				router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+			}
 
 			auth := v1.Group("/auth")
 			{
@@ -169,11 +183,12 @@ func routerHandler(router *gin.Engine) {
 	}
 }
 
-func InitIPInfoVars(apiP, rH, rP string, rCacheTime time.Duration) {
+func InitIPInfoVars(apiP, rH, rP, sDocs string, rCacheTime time.Duration) {
 	API_PORT = apiP
 	REDIS_HOST = rH
 	REDIS_PASSWORD = rP
 	REDIS_CACHE_TIMEOUT_SECOND = rCacheTime
+	SWAGGER_DOCS_HOST = sDocs
 }
 
 

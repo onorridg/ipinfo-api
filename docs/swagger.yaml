@@ -38,6 +38,38 @@ info:
   title: IP Address API
   version: "1.0"
 paths:
+  /auth/password:
+    patch:
+      consumes:
+      - multipart/form-data
+      description: password
+      parameters:
+      - in: formData
+        name: new_password
+        required: true
+        type: string
+      - in: formData
+        name: password
+        required: true
+        type: string
+      - in: formData
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Password reset
+      tags:
+      - auth
   /auth/sign-in:
     post:
       consumes:
