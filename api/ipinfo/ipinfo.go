@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	_ "github.com/onorridg/ipinfo-api/docs"
 
 	"ip"
 	m "middleware"
