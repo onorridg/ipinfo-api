@@ -5,6 +5,7 @@ import (
 	"env"
 )
 
+
 func main() {
 	env.InitEnvVars()
 	API.IPInfo()

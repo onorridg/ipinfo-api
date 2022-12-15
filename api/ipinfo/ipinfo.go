@@ -7,6 +7,8 @@ import (
 	"github.com/gin-contrib/cache"
 	"github.com/gin-contrib/cache/persistence"
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"ip"
 	m "middleware"
@@ -35,6 +37,17 @@ type UserResetPassword struct {
 
 var authMiddleware = m.AuthMiddleware()
 
+
+// @Summary      getIPinfo
+// @Security	 ApiKeyAuth
+// @Description  get IP address info
+// @Tags         ip info
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "IP Address"
+// @Success      200  {object}  ip.IPData
+// @Failure      400  {object}  string
+// @Router       /ip/{ip} [get]
 func getIpinfoV1(c *gin.Context) {
 	IPStr := c.Param("ip")
 	if !validator.IP(IPStr) {
@@ -116,11 +129,13 @@ func routerHandler(router *gin.Engine) {
 	api := router.Group("/api")
 	{
 		v1 := api.Group("/v1")
-		{
+		{	
+			v1.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+
 			account := v1.Group("/account")
 			{
-				account.POST("/signup", postSignInUserV1)
-				account.POST("/signin", authMiddleware.LoginHandler)
+				account.POST("/sign-up", postSignInUserV1)
+				account.POST("/sign-in", authMiddleware.LoginHandler)
 				account.PATCH("/password", patchPasswordResetV1)
 			}
 
@@ -150,6 +165,20 @@ func InitIPInfoVars(apiP, rH, rP string, rCacheTime time.Duration) {
 	REDIS_CACHE_TIMEOUT_SECOND = rCacheTime
 }
 
+
+// @title           IP info API
+// @version         1.0
+// @description     Api для получения информации о IP адресе
+
+// @contact.name   API Support
+// @contact.url    https://t.me/onorridg
+
+// @host      localhost:8080
+// @BasePath  /api/v1
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func IPInfo() {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
