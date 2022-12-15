@@ -1,4 +1,18 @@
+basePath: /api/v1
 definitions:
+  auth.UserJWT:
+    properties:
+      code:
+        type: integer
+      expire:
+        type: string
+      token:
+        type: string
+    required:
+    - code
+    - expire
+    - token
+    type: object
   ip.IPData:
     properties:
       city:
@@ -16,9 +30,70 @@ definitions:
       timezone:
         type: string
     type: object
+host: localhost:8080
 info:
-  contact: {}
+  contact:
+    name: API Support
+    url: http://t.me/onorridg
+  title: IP Address API
+  version: "1.0"
 paths:
+  /auth/sign-in:
+    post:
+      consumes:
+      - multipart/form-data
+      description: sign-in
+      parameters:
+      - in: formData
+        name: password
+        required: true
+        type: string
+      - in: formData
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.UserJWT'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Sign-in
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - multipart/form-data
+      description: sign-up
+      parameters:
+      - in: formData
+        name: password
+        required: true
+        type: string
+      - in: formData
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Sign-up
+      tags:
+      - auth
   /ip/{ip}:
     get:
       consumes:
@@ -27,7 +102,7 @@ paths:
       parameters:
       - description: IP Address
         in: path
-        name: id
+        name: ip
         required: true
         type: string
       produces:
@@ -43,7 +118,12 @@ paths:
             type: string
       security:
       - ApiKeyAuth: []
-      summary: getIPinfo
+      summary: IP address info
       tags:
-      - ip info
+      - ip
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

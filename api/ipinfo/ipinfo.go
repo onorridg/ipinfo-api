@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	_ "github.com/onorridg/ipinfo-api/docs"
+	_ "docs"
 
 	"ip"
 	m "middleware"
@@ -39,13 +39,13 @@ type UserResetPassword struct {
 var authMiddleware = m.AuthMiddleware()
 
 
-// @Summary      getIPinfo
+// @Summary      IP address info 
 // @Security	 ApiKeyAuth
 // @Description  get IP address info
-// @Tags         ip info
+// @Tags         ip
 // @Accept       json
 // @Produce      json
-// @Param        id   path      string  true  "IP Address"
+// @Param        ip   path      string  true  "IP Address"
 // @Success      200  {object}  ip.IPData
 // @Failure      400  {object}  string
 // @Router       /ip/{ip} [get]
@@ -69,7 +69,16 @@ func getIpinfoV1(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, info)
 }
 
-func postSignInUserV1(c *gin.Context) {
+// @Summary      Sign-up
+// @Description  sign-up
+// @Tags         auth
+// @Accept       multipart/form-data
+// @Produce      json
+// @Param        cUser		formData	UserCredential	true "User Credential"
+// @Success      200  {object}  string
+// @Failure      400  {object}  string
+// @Router       /auth/sign-up [post]
+func postSignUpUserV1(c *gin.Context) {
 	uCred := UserCredential{}
 	if err := c.ShouldBind(&uCred); err != nil {
 		c.IndentedJSON(
@@ -131,13 +140,14 @@ func routerHandler(router *gin.Engine) {
 	{
 		v1 := api.Group("/v1")
 		{	
-			v1.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+			// base path swagger docs - /api/v1
+			router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
-			account := v1.Group("/account")
+			auth := v1.Group("/auth")
 			{
-				account.POST("/sign-up", postSignInUserV1)
-				account.POST("/sign-in", authMiddleware.LoginHandler)
-				account.PATCH("/password", patchPasswordResetV1)
+				auth.POST("/sign-up", postSignUpUserV1)
+				auth.POST("/sign-in", authMiddleware.LoginHandler)
+				auth.PATCH("/password", patchPasswordResetV1)
 			}
 
 			ip := v1.Group("/ip")
@@ -167,19 +177,6 @@ func InitIPInfoVars(apiP, rH, rP string, rCacheTime time.Duration) {
 }
 
 
-// @title           IP info API
-// @version         1.0
-// @description     Api для получения информации о IP адресе
-
-// @contact.name   API Support
-// @contact.url    https://t.me/onorridg
-
-// @host      localhost:8080
-// @BasePath  /api/v1
-
-// @securityDefinitions.apikey ApiKeyAuth
-// @in header
-// @name Authorization
 func IPInfo() {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()

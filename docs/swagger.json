@@ -1,9 +1,102 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "title": "IP Address API",
+        "contact": {
+            "name": "API Support",
+            "url": "http://t.me/onorridg"
+        },
+        "version": "1.0"
     },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
     "paths": {
+        "/auth/sign-in": {
+            "post": {
+                "description": "sign-in",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Sign-in",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "password",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "username",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/auth.UserJWT"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/sign-up": {
+            "post": {
+                "description": "sign-up",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Sign-up",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "password",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "username",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/ip/{ip}": {
             "get": {
                 "security": [
@@ -19,14 +112,14 @@
                     "application/json"
                 ],
                 "tags": [
-                    "ip info"
+                    "ip"
                 ],
-                "summary": "getIPinfo",
+                "summary": "IP address info",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "IP Address",
-                        "name": "id",
+                        "name": "ip",
                         "in": "path",
                         "required": true
                     }
@@ -49,6 +142,25 @@
         }
     },
     "definitions": {
+        "auth.UserJWT": {
+            "type": "object",
+            "required": [
+                "code",
+                "expire",
+                "token"
+            ],
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "expire": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
         "ip.IPData": {
             "type": "object",
             "properties": {
@@ -74,6 +186,13 @@
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

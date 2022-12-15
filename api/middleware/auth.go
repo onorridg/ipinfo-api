@@ -15,9 +15,15 @@ var JWT_SECRET_KEY string
 
 var identityKey = "username"
 
-type login struct {
+type UserCredential struct {
 	Username string `form:"username" json:"username" binding:"required"`
 	Password string `form:"password" json:"password" binding:"required"`
+}
+
+type UserJWT struct {
+	Code int `form:"code" json:"code" binding:"required"`
+	Expire string `form:"expire" json:"expire" binding:"required"`
+	Token string `form:"token" json:"token" binding:"required"`
 }
 
 var Roles = map[string][]string{
@@ -33,6 +39,16 @@ func InitAuthVars(jwtSK string) {
 	JWT_SECRET_KEY = jwtSK
 }
 
+
+// @Summary      Sign-in
+// @Description  sign-in
+// @Tags         auth
+// @Accept       multipart/form-data
+// @Produce      json
+// @Param        cUser		formData	UserCredential	true "User Credential"
+// @Success      200  {object}  UserJWT
+// @Failure      400  {object}  string
+// @Router       /auth/sign-in [post]
 func AuthMiddleware() *jwt.GinJWTMiddleware {
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "test zone",
@@ -55,7 +71,7 @@ func AuthMiddleware() *jwt.GinJWTMiddleware {
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
-			var loginVals login
+			var loginVals UserCredential
 			if err := c.ShouldBind(&loginVals); err != nil {
 				return "", jwt.ErrMissingLoginValues
 			}

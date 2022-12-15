@@ -3,6 +3,7 @@ module ipinfo
 go 1.19
 
 require (
+	docs v0.0.0-00010101000000-000000000000
 	github.com/gin-contrib/cache v1.2.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/swaggo/files v1.0.0
@@ -15,6 +16,7 @@ require (
 )
 
 replace (
+	docs => ../../docs
 	ip => ../../utils/ip
 	middleware => ../middleware
 	password => ../../utils/password
