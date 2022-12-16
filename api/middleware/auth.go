@@ -16,14 +16,19 @@ var JWT_SECRET_KEY string
 var identityKey = "username"
 
 type UserCredential struct {
-	Username string `form:"username" json:"username" binding:"required"`
-	Password string `form:"password" json:"password" binding:"required"`
+	Username string `form:"username" json:"username" binding:"required" extensions:"x-order=0"`
+	Password string `form:"password" json:"password" binding:"required" extensions:"x-order=1"`
 }
 
 type UserJWT struct {
 	Code int `form:"code" json:"code" binding:"required"`
 	Expire string `form:"expire" json:"expire" binding:"required"`
 	Token string `form:"token" json:"token" binding:"required"`
+}
+
+type MessageResponse struct {
+	Code	int	`form:"code" json:"code" binding:"required"`
+	Message string `form:"message" json:"message" binding:"required"`
 }
 
 var Roles = map[string][]string{
@@ -47,7 +52,7 @@ func InitAuthVars(jwtSK string) {
 // @Produce      json
 // @Param        cUser		formData	UserCredential	true "User Credential"
 // @Success      200  {object}  UserJWT
-// @Failure      400  {object}  string
+// @Failure      401  {object}  MessageResponse
 // @Router       /auth/sign-in [post]
 func AuthMiddleware() *jwt.GinJWTMiddleware {
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{

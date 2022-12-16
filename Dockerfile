@@ -8,5 +8,5 @@ FROM alpine
 WORKDIR /app 
 COPY --from=builder /app/ipinfo-api .
 COPY .env .
-EXPOSE 8080 8080
+EXPOSE "${API_PORT}" "${API_PORT}"
 CMD [ "./ipinfo-api" ]

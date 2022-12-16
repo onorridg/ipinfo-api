@@ -1,5 +1,15 @@
 basePath: /api/v1
 definitions:
+  auth.MessageResponse:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    required:
+    - code
+    - message
+    type: object
   auth.UserJWT:
     properties:
       code:
@@ -30,6 +40,16 @@ definitions:
       timezone:
         type: string
     type: object
+  ipinfo.MessageResponse:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    required:
+    - code
+    - message
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -45,28 +65,35 @@ paths:
       description: password
       parameters:
       - in: formData
-        name: new_password
+        name: username
         required: true
         type: string
+        x-order: "0"
       - in: formData
         name: password
         required: true
         type: string
+        x-order: "1"
       - in: formData
-        name: username
+        name: new_password
         required: true
         type: string
+        x-order: "3"
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            type: string
-        "400":
-          description: Bad Request
+            $ref: '#/definitions/ipinfo.MessageResponse'
+        "409":
+          description: Conflict
           schema:
-            type: string
+            $ref: '#/definitions/ipinfo.MessageResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/ipinfo.MessageResponse'
       summary: Password reset
       tags:
       - auth
@@ -77,13 +104,15 @@ paths:
       description: sign-in
       parameters:
       - in: formData
-        name: password
-        required: true
-        type: string
-      - in: formData
         name: username
         required: true
         type: string
+        x-order: "0"
+      - in: formData
+        name: password
+        required: true
+        type: string
+        x-order: "1"
       produces:
       - application/json
       responses:
@@ -91,10 +120,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/auth.UserJWT'
-        "400":
-          description: Bad Request
+        "401":
+          description: Unauthorized
           schema:
-            type: string
+            $ref: '#/definitions/auth.MessageResponse'
       summary: Sign-in
       tags:
       - auth
@@ -105,24 +134,30 @@ paths:
       description: sign-up
       parameters:
       - in: formData
-        name: password
-        required: true
-        type: string
-      - in: formData
         name: username
         required: true
         type: string
+        x-order: "0"
+      - in: formData
+        name: password
+        required: true
+        type: string
+        x-order: "1"
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            type: string
-        "400":
-          description: Bad Request
+            $ref: '#/definitions/ipinfo.MessageResponse'
+        "409":
+          description: Conflict
           schema:
-            type: string
+            $ref: '#/definitions/ipinfo.MessageResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/ipinfo.MessageResponse'
       summary: Sign-up
       tags:
       - auth
@@ -147,7 +182,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            type: string
+            $ref: '#/definitions/ipinfo.MessageResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ipinfo.MessageResponse'
       security:
       - ApiKeyAuth: []
       summary: IP address info

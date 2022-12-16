@@ -29,12 +29,17 @@ const (
 )
 
 type UserCredential struct {
-	Username string `form:"username" json:"username" binding:"required"`
-	Password string `form:"password" json:"password" binding:"required"`
+	Username string `form:"username" json:"username" binding:"required" extensions:"x-order=0"`
+	Password string `form:"password" json:"password" binding:"required" extensions:"x-order=1"`
 }
 type UserResetPassword struct {
 	UserCredential
-	NewPassword string `form:"new_password" json:"new_password" binding:"required"`
+	NewPassword string `form:"new_password" json:"new_password" binding:"required" extensions:"x-order=3"`
+}
+
+type MessageResponse struct {
+	Code	int	`form:"code" json:"code" binding:"required"`
+	Message string `form:"message" json:"message" binding:"required"`
 }
 
 var authMiddleware = m.AuthMiddleware()
@@ -48,14 +53,17 @@ var authMiddleware = m.AuthMiddleware()
 // @Produce      json
 // @Param        ip   path      string  true  "IP Address"
 // @Success      200  {object}  ip.IPData
-// @Failure      400  {object}  string
+// @Failure      400  {object}  MessageResponse
+// @Failure      401  {object}  MessageResponse
 // @Router       /ip/{ip} [get]
 func getIpinfoV1(c *gin.Context) {
 	IPStr := c.Param("ip")
 	if !validator.IP(IPStr) {
 		c.IndentedJSON(
 			http.StatusBadRequest,
-			gin.H{"message": "Invalid ip address"},
+			MessageResponse{
+				Code: http.StatusBadRequest, 
+				Message: "Invalid ip address"},
 		)
 		return
 	}
@@ -63,7 +71,10 @@ func getIpinfoV1(c *gin.Context) {
 	if err != nil {
 		c.IndentedJSON(
 			StatusUnknownError,
-			gin.H{"message": "Unknown error"},
+			MessageResponse{
+				Code: http.StatusBadRequest, 
+				Message: "Invalid ip address",
+			},
 		)
 		return
 	}
@@ -76,15 +87,19 @@ func getIpinfoV1(c *gin.Context) {
 // @Accept       multipart/form-data
 // @Produce      json
 // @Param        cUser		formData	UserCredential	true "User Credential"
-// @Success      200  {object}  string
-// @Failure      400  {object}  string
+// @Success      200  {object}  MessageResponse
+// @Failure      409  {object}  MessageResponse
+// @Failure      422  {object}  MessageResponse
 // @Router       /auth/sign-up [post]
 func postSignUpUserV1(c *gin.Context) {
 	uCred := UserCredential{}
 	if err := c.ShouldBind(&uCred); err != nil {
 		c.IndentedJSON(
 			http.StatusUnprocessableEntity,
-			gin.H{"message": "Invalid user credential"},
+			MessageResponse{
+				Code: http.StatusUnprocessableEntity,
+				Message: "Invalid user credential",
+			},
 		)
 		return
 	}
@@ -93,13 +108,19 @@ func postSignUpUserV1(c *gin.Context) {
 	if err != nil {
 		c.IndentedJSON(
 			http.StatusConflict,
-			gin.H{"message": "Username already exist"},
+			MessageResponse{
+				Code: http.StatusConflict,
+				Message: "Username already exist",
+			},
 		)
 		return
 	}
 	c.IndentedJSON(
 		http.StatusCreated,
-		gin.H{"message": "Ok"},
+		MessageResponse{
+			Code: http.StatusOK,
+			Message:"Password updated",
+		},
 	)
 }
 
@@ -109,15 +130,19 @@ func postSignUpUserV1(c *gin.Context) {
 // @Accept       multipart/form-data
 // @Produce      json
 // @Param        cUser		formData	UserResetPassword 	true "User Credential + new password"
-// @Success      200  {object}  string
-// @Failure      400  {object}  string
+// @Success      200  {object}  MessageResponse
+// @Failure      409  {object}  MessageResponse
+// @Failure      422  {object}  MessageResponse
 // @Router       /auth/password [patch]
 func patchPasswordResetV1(c *gin.Context) {
 	uCred := UserResetPassword{}
 	if err := c.ShouldBind(&uCred); err != nil {
 		c.IndentedJSON(
 			http.StatusUnprocessableEntity,
-			gin.H{"message": "Invalid user credential"},
+			MessageResponse{
+				Code: http.StatusUnprocessableEntity,
+				Message: "Invalid user credential",
+			},
 		)
 		return
 	}
@@ -126,7 +151,10 @@ func patchPasswordResetV1(c *gin.Context) {
 	if ex == rdb.UserMissing || !p.CompareHashPassword(hPassword, uCred.Password) {
 		c.IndentedJSON(
 			http.StatusUnprocessableEntity,
-			gin.H{"message": "Invalid user credential"},
+			MessageResponse{
+				Code: http.StatusConflict,
+				Message: "Username already exist",
+			},
 		)
 		return
 	}
@@ -135,7 +163,10 @@ func patchPasswordResetV1(c *gin.Context) {
 	_ = rdb.UpdateValue(uCred.Username, hNewPassword)
 	c.IndentedJSON(
 		http.StatusOK,
-		gin.H{"message": "Password updated"},
+		MessageResponse{
+			Code: http.StatusOK,
+			Message:"Password updated",
+		},
 	)
 }
 

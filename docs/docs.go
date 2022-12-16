@@ -35,19 +35,22 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "name": "new_password",
+                        "x-order": "0",
+                        "name": "username",
                         "in": "formData",
                         "required": true
                     },
                     {
                         "type": "string",
+                        "x-order": "1",
                         "name": "password",
                         "in": "formData",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "name": "username",
+                        "x-order": "3",
+                        "name": "new_password",
                         "in": "formData",
                         "required": true
                     }
@@ -56,13 +59,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/ipinfo.MessageResponse"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "409": {
+                        "description": "Conflict",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/ipinfo.MessageResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/ipinfo.MessageResponse"
                         }
                     }
                 }
@@ -84,13 +93,15 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "name": "password",
+                        "x-order": "0",
+                        "name": "username",
                         "in": "formData",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "name": "username",
+                        "x-order": "1",
+                        "name": "password",
                         "in": "formData",
                         "required": true
                     }
@@ -102,10 +113,10 @@ const docTemplate = `{
                             "$ref": "#/definitions/auth.UserJWT"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/auth.MessageResponse"
                         }
                     }
                 }
@@ -127,13 +138,15 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "name": "password",
+                        "x-order": "0",
+                        "name": "username",
                         "in": "formData",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "name": "username",
+                        "x-order": "1",
+                        "name": "password",
                         "in": "formData",
                         "required": true
                     }
@@ -142,13 +155,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/ipinfo.MessageResponse"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "409": {
+                        "description": "Conflict",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/ipinfo.MessageResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/ipinfo.MessageResponse"
                         }
                     }
                 }
@@ -191,7 +210,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/ipinfo.MessageResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ipinfo.MessageResponse"
                         }
                     }
                 }
@@ -199,6 +224,21 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "auth.MessageResponse": {
+            "type": "object",
+            "required": [
+                "code",
+                "message"
+            ],
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "auth.UserJWT": {
             "type": "object",
             "required": [
@@ -240,6 +280,21 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "timezone": {
+                    "type": "string"
+                }
+            }
+        },
+        "ipinfo.MessageResponse": {
+            "type": "object",
+            "required": [
+                "code",
+                "message"
+            ],
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
                     "type": "string"
                 }
             }
