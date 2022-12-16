@@ -118,7 +118,7 @@ func postSignUpUserV1(c *gin.Context) {
 		http.StatusCreated,
 		MessageResponse{
 			Code:    http.StatusOK,
-			Message: "Password updated",
+			Message: "User created",
 		},
 	)
 }
