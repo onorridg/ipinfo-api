@@ -23,7 +23,7 @@ type ENV struct {
 	REDIS_PASSWORD             string
 	REDIS_USER_DB_ID           int
 	REDIS_CACHE_TIMEOUT_SECOND time.Duration
-	SWAGGER_DOCS_HOST		   string
+	SWAGGER_DOCS_HOST          string
 }
 
 func InitEnvVars() {
@@ -54,7 +54,7 @@ func InitEnvVars() {
 		REDIS_PASSWORD:             os.Getenv("REDIS_PASSWORD"),
 		REDIS_USER_DB_ID:           rUserDID,
 		REDIS_CACHE_TIMEOUT_SECOND: time.Duration(rCacheTime),
-		SWAGGER_DOCS_HOST: 			os.Getenv("SWAGGER_DOCS_HOST"),
+		SWAGGER_DOCS_HOST:          os.Getenv("SWAGGER_DOCS_HOST"),
 	}
 	api.InitIPInfoVars(
 		env.API_PORT,

@@ -21,13 +21,13 @@ type UserCredential struct {
 }
 
 type UserJWT struct {
-	Code int `form:"code" json:"code" binding:"required"`
+	Code   int    `form:"code" json:"code" binding:"required"`
 	Expire string `form:"expire" json:"expire" binding:"required"`
-	Token string `form:"token" json:"token" binding:"required"`
+	Token  string `form:"token" json:"token" binding:"required"`
 }
 
 type MessageResponse struct {
-	Code	int	`form:"code" json:"code" binding:"required"`
+	Code    int    `form:"code" json:"code" binding:"required"`
 	Message string `form:"message" json:"message" binding:"required"`
 }
 
@@ -44,16 +44,15 @@ func InitAuthVars(jwtSK string) {
 	JWT_SECRET_KEY = jwtSK
 }
 
-
-// @Summary      Sign-in
-// @Description  sign-in
-// @Tags         auth
-// @Accept       multipart/form-data
-// @Produce      json
-// @Param        cUser		formData	UserCredential	true "User Credential"
-// @Success      200  {object}  UserJWT
-// @Failure      401  {object}  MessageResponse
-// @Router       /auth/sign-in [post]
+//	@Summary		Sign-in
+//	@Description	sign-in
+//	@Tags			auth
+//	@Accept			multipart/form-data
+//	@Produce		json
+//	@Param			cUser	formData	UserCredential	true	"User Credential"
+//	@Success		200		{object}	UserJWT
+//	@Failure		401		{object}	MessageResponse
+//	@Router			/auth/sign-in [post]
 func AuthMiddleware() *jwt.GinJWTMiddleware {
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "test zone",
