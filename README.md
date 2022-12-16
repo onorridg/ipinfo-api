@@ -2,7 +2,8 @@
 ## Обязательно измените поля .ENV
 ```bash
 JWT_SECRET_KEY=
-PASSWORD_SALT=
+PASSWORD_SALT=        
+SWAGGER_DOCS_HOST=   # Укажите свой хост для swagger docs
 ```
 ## Установка
 ```bash
