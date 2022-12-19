@@ -1,4 +1,6 @@
-# ipinfo-api - cервис для получения информации об IP адресе
+# IP INFO API - cервис для получения информации об IP адресе
+![ip-info-api](https://user-images.githubusercontent.com/83474704/208415009-d3299b27-f4cb-434e-ae32-71d33c84cfbd.png)
+
 ## Обязательно измените поля .ENV
 ```bash
 JWT_SECRET_KEY=
