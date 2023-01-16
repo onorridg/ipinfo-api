@@ -21,16 +21,10 @@ make start  # Запустить  api и redisDB
 ## Документация
 **Авторизация: `Bearer Token`**
 
-**https://ip.onorridg.tech/swagger/index.html**
+**http://127.0.0.1:8080/swagger/index.html**
 
 ![Screenshot swagger docs](https://user-images.githubusercontent.com/83474704/208075081-93840301-8162-46cf-b0f3-652c93df1e87.png)
 
 
 ## Пример запроса:
 ![Screenshot api request](https://user-images.githubusercontent.com/83474704/208075834-80007709-82ac-4956-907c-df2d2f631462.png)
-
-## Протестировать API:
-```bash
-https://ip.onorridg.tech/api/v1   # Base URL
-```
-

@@ -44,17 +44,17 @@ type MessageResponse struct {
 
 var authMiddleware = m.AuthMiddleware()
 
-//	@Summary		IP address info
-//	@Security		ApiKeyAuth
-//	@Description	get IP address info
-//	@Tags			ip
-//	@Accept			json
-//	@Produce		json
-//	@Param			ip	path		string	true	"IP Address"
-//	@Success		200	{object}	ip.IPData
-//	@Failure		400	{object}	MessageResponse
-//	@Failure		401	{object}	MessageResponse
-//	@Router			/ip/{ip} [get]
+// @Summary		IP address info
+// @Security		ApiKeyAuth
+// @Description	get IP address info
+// @Tags			ip
+// @Accept			json
+// @Produce		json
+// @Param			ip	path		string	true	"IP Address"
+// @Success		200	{object}	ip.IPData
+// @Failure		400	{object}	MessageResponse
+// @Failure		401	{object}	MessageResponse
+// @Router			/ip/{ip} [get]
 func getIpinfoV1(c *gin.Context) {
 	IPStr := c.Param("ip")
 	if !validator.IP(IPStr) {
@@ -80,16 +80,16 @@ func getIpinfoV1(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, info)
 }
 
-//	@Summary		Sign-up
-//	@Description	sign-up
-//	@Tags			auth
-//	@Accept			multipart/form-data
-//	@Produce		json
-//	@Param			cUser	formData	UserCredential	true	"User Credential"
-//	@Success		200		{object}	MessageResponse
-//	@Failure		409		{object}	MessageResponse
-//	@Failure		422		{object}	MessageResponse
-//	@Router			/auth/sign-up [post]
+// @Summary		Sign-up
+// @Description	sign-up
+// @Tags			auth
+// @Accept			multipart/form-data
+// @Produce		json
+// @Param			cUser	formData	UserCredential	true	"User Credential"
+// @Success		200		{object}	MessageResponse
+// @Failure		409		{object}	MessageResponse
+// @Failure		422		{object}	MessageResponse
+// @Router			/auth/sign-up [post]
 func postSignUpUserV1(c *gin.Context) {
 	uCred := UserCredential{}
 	if err := c.ShouldBind(&uCred); err != nil {
@@ -123,16 +123,16 @@ func postSignUpUserV1(c *gin.Context) {
 	)
 }
 
-//	@Summary		Password reset
-//	@Description	password
-//	@Tags			auth
-//	@Accept			multipart/form-data
-//	@Produce		json
-//	@Param			cUser	formData	UserResetPassword	true	"User Credential + new password"
-//	@Success		200		{object}	MessageResponse
-//	@Failure		409		{object}	MessageResponse
-//	@Failure		422		{object}	MessageResponse
-//	@Router			/auth/password [patch]
+// @Summary		Password reset
+// @Description	password
+// @Tags			auth
+// @Accept			multipart/form-data
+// @Produce		json
+// @Param			cUser	formData	UserResetPassword	true	"User Credential + new password"
+// @Success		200		{object}	MessageResponse
+// @Failure		409		{object}	MessageResponse
+// @Failure		422		{object}	MessageResponse
+// @Router			/auth/password [patch]
 func patchPasswordResetV1(c *gin.Context) {
 	uCred := UserResetPassword{}
 	if err := c.ShouldBind(&uCred); err != nil {
@@ -219,6 +219,9 @@ func InitIPInfoVars(apiP, rH, rP, sDocs string, rCacheTime time.Duration) {
 	REDIS_PASSWORD = rP
 	REDIS_CACHE_TIMEOUT_SECOND = rCacheTime
 	SWAGGER_DOCS_HOST = sDocs
+	if SWAGGER_DOCS_HOST == "127.0.0.1" || SWAGGER_DOCS_HOST == "localhost" {
+		SWAGGER_DOCS_HOST = SWAGGER_DOCS_HOST + ":" + API_PORT
+	}
 }
 
 func IPInfo() {
